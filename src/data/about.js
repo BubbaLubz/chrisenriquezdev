@@ -1,7 +1,7 @@
 export const about = {
   name: 'Christopher Enriquez',
   tagline: 'Data Engineering · Cloud Infrastructure · ETL Pipelines',
-  bio: "Data engineering student at Cal Poly SLO, building ETL pipelines with cloud infrastructure. ",
+  bio: "Data engineering student at Cal Poly SLO, building data pipelines with cloud infrastructure. ",
   links: {
     linkedin: 'https://linkedin.com/in/chris-a-enriquez/',
     github: 'https://github.com/BubbaLubz',

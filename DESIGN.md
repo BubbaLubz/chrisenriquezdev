@@ -53,7 +53,7 @@ Not an invented metaphor — the actual data engineering lifecycle diagram, the 
 
 **Key Characteristics:**
 - Near-monochrome: white, near-black, gray. Nothing else, except —
-- One quiet accent (muted slate-blue), spent on exactly two things: the connector lines between stages, and the hover/active state of a stage
+- One quiet accent (muted slate-blue), spent on exactly one thing: the hover/active/selected state of a box (a main-diagram stage, or a node in a per-project architecture diagram). Connector lines were tried in Signal Blue and explicitly reverted back to neutral gray — see the Colors section below.
 - Single type family (General Sans) for everything except tech-stack tags, which alone keep the monospace face — reserved, not a background texture
 - Flat by default — no shadows, no glow, no blur anywhere in this version (the prior system's "one glass rule" is gone entirely; there's no floating panel left that needs it)
 - Motion is minimal on purpose: a faint, slow pulse on the stage-to-stage connectors (barely perceptible, "a heartbeat, not a demo effect" — direct instruction), nothing else animates on its own
@@ -63,7 +63,8 @@ Not an invented metaphor — the actual data engineering lifecycle diagram, the 
 Near-monochrome strategy, one step more restrained than "Restrained": white/black/gray carries the entire surface, and the single accent's rarity — not its saturation — is what makes it register at all.
 
 ### Primary
-- **Signal Blue** (`oklch(0.45 0.06 240)`): the only color in the system beyond grayscale. Used for exactly two things — the stage-to-stage connector lines, and a stage box's border/label when hovered or active. Nowhere else. Measured 7.35:1 against Bg, so it's legible enough to double as link-style text if ever needed, but its job here is marking state, not carrying content.
+- **Signal Blue** (`oklch(0.45 0.06 240)`): the only color in the system beyond grayscale. Used for exactly one thing — a box's border/label when hovered, active, or selected (main-diagram stage boxes, and a selected node in a per-project `MiniArchitecture` diagram). Nowhere else. Measured 7.35:1 against Bg, so it's legible enough to double as link-style text if ever needed, but its job here is marking state, not carrying content.
+- **Connector lines are neutral gray (`Border`), not Signal Blue**, despite an earlier version of this doc saying otherwise — a switch to Signal Blue was tried and explicitly reverted. They carry the faint pulse animation on `Border`'s color instead. If this is revisited, it's a deliberate ask, not a bug to fix on sight.
 
 ### Neutral
 - **Bg** (`oklch(1 0 0)`) — pure white, chroma 0. Not an off-white, not warm-tinted — per the "pure white" default, the mood lives in restraint and typography, not in a tinted surface.
@@ -73,7 +74,7 @@ Near-monochrome strategy, one step more restrained than "Restrained": white/blac
 - **Muted** (`oklch(0.5 0 0)`) — secondary text (dates, captions, byline context). Measured 6.0:1 against Bg — clears AA with margin.
 
 ### Named Rules
-**The One Color Rule.** Signal Blue appears in exactly two places: connectors and hover/active state. If a third use case wants color, the answer is almost always "use weight or size instead," not "spend the accent again."
+**The One Color Rule.** Signal Blue appears in exactly one place: a box's hover/active/selected state. If another use case wants color, the answer is almost always "use weight or size instead," not "spend the accent again."
 
 **The No-Glow Rule.** No box-shadow-as-glow, no blur, no atmospheric background. If a state needs emphasis, change border color/weight or background tint — never add a shadow that makes something look like it's lit from within. That was v1's tell.
 
@@ -106,7 +107,7 @@ Flat. No shadows, no blur, anywhere in this version. Separation between elements
 
 ### Do:
 - **Do** default to Border + Bg for separating regions; reach for Surface only when a border genuinely doesn't read.
-- **Do** keep Signal Blue to its two jobs (connectors, hover/active state) — per the One Color Rule.
+- **Do** keep Signal Blue to its one job (hover/active/selected state) — per the One Color Rule.
 - **Do** use General Sans for every date, badge, and label that v1 put in mono — mono is earned only by tech-stack tags now.
 - **Do** keep the connector animation faint and slow enough that a visitor has to look for it, not fast enough that it looks for them.
 - **Do** provide a `prefers-reduced-motion` fallback for the connector pulse and any transitions, per PRODUCT.md's Accessibility section.
