@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  /* Hide the page-level scrollbar only — scrolling still works via wheel,
+     trackpad, touch, and keyboard. */
+  html {
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
+  body {
+    @apply bg-bg text-ink font-body antialiased;
+  }
+
+  ::selection {
+    @apply bg-border text-ink;
+  }
+
+  a {
+    @apply text-ink underline decoration-border underline-offset-2 transition-colors duration-150 hover:decoration-ink;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.accent');
+    outline-offset: 2px;
+  }
+}
+
+.animate-detail-in {
+  animation: detail-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes detail-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-detail-out {
+  animation: detail-out 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes detail-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* "A heartbeat, not a demo effect" — faint, slow, easy to miss on purpose. */
+.connector-pulse {
+  animation: connector-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes connector-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Hides a scroll container's native scrollbar chrome while leaving it fully
+   scrollable (wheel, trackpad, touch, keyboard) — same technique as the
+   page-level scrollbar above, reusable wherever a scroll affordance would
+   otherwise look like visual clutter. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
