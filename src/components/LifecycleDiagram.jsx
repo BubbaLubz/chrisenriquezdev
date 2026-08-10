@@ -73,9 +73,9 @@ export default function LifecycleDiagram() {
           </span>
 
           <div className="flex flex-col gap-2 md:w-56 md:shrink-0">
-            <OutputCard label="Output" title="Download resume" href={about.resume} />
-            <OutputCard label="Output" title="Get in touch" href={about.email} />
-            <OutputCard label="Output" title="LinkedIn & GitHub" href={about.links.linkedin} external />
+            <OutputCard label="Output" title="Resume" href={about.resume} />
+            <OutputCard label="Output" title="Contact Information" href={about.email} />
+            <OutputCard label="Output" title="Social Media" href={about.links.linkedin} external />
           </div>
         </div>
 

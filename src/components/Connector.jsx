@@ -7,7 +7,7 @@ export default function Connector({ direction = 'horizontal' }) {
       aria-hidden="true"
       className={`connector-pulse shrink-0 text-border ${direction === 'horizontal' ? 'px-1' : 'py-1'}`}
     >
-      {direction === 'horizontal' ? '→' : '↓'}
+      →
     </span>
   )
 }

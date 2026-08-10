@@ -8,8 +8,10 @@ export const projects = [
     title: 'Cloud Music Analytics Platform',
     company: 'Independent project',
     stageBadge: 'ingestion',
-    description:
+    description:[
+      'Think Spotify wrapped, but for your entire listening history.',
       'An event-driven AWS pipeline ingesting 165k+ ListenBrainz listening events through Kafka, with 30-minute polling and at-least-once delivery guaranteed via offset-after-write commits. Checkpoint-based and Redis deduplication kept the 30-minute poll cycles from reprocessing anything already ingested. Terraform provisioned the infrastructure, including a 1GB-per-query Athena cost guardrail and a 90-day S3 lifecycle policy on raw data.',
+    ],
     techStack: ['Python', 'AWS Lambda', 'Kafka', 'Athena', 'dbt', 'Grafana', 'Terraform'],
     links: {
       repo: 'https://github.com/BubbaLubz/spotify-enrichment-pipeline',
@@ -132,18 +134,21 @@ export const projects = [
     company: 'Independent project',
     stageBadge: 'storage',
     description:
-      'An AI infrastructure diagramming tool that converts Claude-generated JSON into Dagre-computed ReactFlow graphs, across a 37-component system spanning 11 infrastructure categories. Replacing full ReactFlow object serialization with minimal node/edge schemas cut edit-mode payload size by 40% and input tokens by 34%. Ambiguous infrastructure prompts get flagged with 100% accuracy on a 20-prompt test set, with a user-triggered best-effort fallback so a bad prompt never traps someone in a clarification loop.',
-    techStack: ['TypeScript', 'React', 'ReactFlow', 'Dagre', 'Anthropic API', 'Supabase'],
+      [ 'A study on data engineering system design.',
+        'An AI infrastructure diagramming tool that converts Claude-generated JSON into Dagre-computed ReactFlow graphs, across a 37-component system spanning 11 infrastructure categories. Replacing full ReactFlow object serialization with minimal node/edge schemas cut edit-mode payload size by 40% and input tokens by 34%. Ambiguous infrastructure prompts get flagged with 100% accuracy on a 20-prompt test set, with a user-triggered best-effort fallback so a bad prompt never traps someone in a clarification loop.',
+      ],
+        techStack: ['TypeScript', 'React', 'ReactFlow', 'Dagre', 'Anthropic API', 'Supabase'],
     links: {
       repo: 'https://github.com/BubbaLubz/DEDiagram',
     },
   },
   {
     id: 'pfas-reporting-layer',
-    title: 'PFAS Trend Analysis Reporting Layer',
+    title: 'PFAS Analytic Pipeline',
     company: 'EKI Environment and Water Inc., Jan 2026 — Jun 2026',
     stageBadge: 'transformation',
     description: [
+      "Nationwide sample analysis on man-made carcineogens.",
       "Built a data integration and standardization pipeline that ingests messy, inconsistent PFAS water-quality datasets from federal and state agencies and normalizes them at scale — resolving 1M+ records through a documented nine-stage workflow that maps everything into a canonical relational schema across four tables (chemical, location, sample, sample_source), normalizing analytes, dates, units, locations, and QA findings along the way. OpenAI and Anthropic APIs powered non-detect identification and QA validation within the workflow, taking non-detect identification from 0% to 81% and cutting QA false positives by 53%.",
       "The pipeline's outputs feed a normalized MySQL data model and SQL reporting layer, plus standardized CSV/Excel exports and an optional DuckDB-backed database — powering Power BI, Tableau, and Streamlit dashboards for California PFAS trend analysis, built while leading a 5-person team on the Dockerized standardization tool.",
       'Presented the final product to an audience of divisional vice presidents, senior water engineers, project directors, and club members before handing it off to EKI.',
