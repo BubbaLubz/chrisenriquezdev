@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import MiniArchitecture from './MiniArchitecture'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
@@ -18,12 +18,36 @@ export default function DetailView({ project }) {
   const navigate = useNavigate()
   const reducedMotion = useReducedMotion()
   const [isExiting, setIsExiting] = useState(false)
+  // Once the architecture wrapper's entrance animation finishes, its class
+  // is dropped entirely rather than left attached — animation-fill-mode:
+  // both holds transform: translateY(0) forever otherwise, and even though
+  // that's visually a no-op, a non-none transform on an ancestor of
+  // MiniArchitecture's own independently-scrollable container is a known
+  // class of browser bug that can corrupt how the descendant's scroll
+  // bounds get computed (this is very likely why the diagram was
+  // unscrollable in one direction until something else forced a reflow).
+  // No other reveal-wrapped section here has a scrollable descendant, so
+  // this only needs doing for the architecture wrapper.
+  const [architectureSettled, setArchitectureSettled] = useState(false)
   const [selectedNode, setSelectedNode] = useState(null) // what the diagram currently has picked
   const [displayedNode, setDisplayedNode] = useState(null) // what's actually rendered in the text area
   const [swapFading, setSwapFading] = useState(false)
   const linkEntries = Object.entries(project.links ?? {})
   const paragraphs = Array.isArray(project.description) ? project.description : [project.description]
   const screenshots = project.screenshots ?? []
+
+  // Belt-and-suspenders alongside the onAnimationEnd handler below: a tab
+  // that's backgrounded/not visible at the moment the animation would run
+  // (verified this actually happens under automated testing — Chrome
+  // pauses CSS animations in hidden tabs) never fires animationend, which
+  // would otherwise leave architectureSettled stuck false, and the lingering
+  // transform bug right along with it. 1500ms comfortably covers this page's
+  // worst-case stagger delay plus the animation's own 600ms duration.
+  useEffect(() => {
+    if (reducedMotion || !project.architecture) return
+    const t = setTimeout(() => setArchitectureSettled(true), 1500)
+    return () => clearTimeout(t)
+  }, [reducedMotion, project.architecture])
 
   const handleBack = (e) => {
     if (reducedMotion) return // let the Link navigate immediately, nothing to wait for
@@ -97,7 +121,11 @@ export default function DetailView({ project }) {
         </div>
 
         {project.architecture && (
-          <div className={`mt-6 flex justify-center${architectureReveal.className}`} style={architectureReveal.style}>
+          <div
+            className={`mt-6 flex justify-center${architectureSettled ? '' : architectureReveal.className}`}
+            style={architectureSettled ? undefined : architectureReveal.style}
+            onAnimationEnd={() => setArchitectureSettled(true)}
+          >
             <MiniArchitecture
               architecture={project.architecture}
               selectedId={selectedNode?.id ?? null}

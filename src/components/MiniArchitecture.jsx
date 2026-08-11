@@ -79,6 +79,12 @@ export default function MiniArchitecture({ architecture, selectedId, onSelectNod
     el.addEventListener('scroll', updateScrollState, { passive: true })
     const resizeObserver = new ResizeObserver(updateScrollState)
     resizeObserver.observe(el)
+    // Web font swap can resize the grid's natural (min-/max-content) width
+    // after the browser already settled this container's scroll bounds at
+    // first paint — ResizeObserver only tells JS the box changed, it
+    // doesn't itself fix a stale native scroll-bounds computation, so this
+    // re-triggers a real measurement once fonts are actually final too.
+    document.fonts?.ready?.then(updateScrollState)
     return () => {
       el.removeEventListener('scroll', updateScrollState)
       resizeObserver.disconnect()
@@ -167,6 +173,7 @@ export default function MiniArchitecture({ architecture, selectedId, onSelectNod
           className={`no-scrollbar relative overflow-auto overscroll-contain sm:overflow-y-hidden ${
             selectedNode ? 'sm:overflow-x-hidden' : 'sm:overflow-x-auto'
           }`}
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
           <div
             className="grid w-max origin-center gap-x-1 gap-y-1 py-3 transition-transform duration-300 ease-out-quart"
