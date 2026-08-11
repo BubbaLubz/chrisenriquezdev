@@ -34,7 +34,7 @@ export default function AboutDetail({ about }) {
   const revealClass = reducedMotion || isExiting ? '' : ' animate-detail-in stagger-delay'
 
   return (
-    <div className="min-h-screen bg-bg px-4 py-10 sm:py-16">
+    <div className="min-h-screen bg-bg px-4 pb-10 pt-20 sm:py-16">
       <Link
         to="/"
         onClick={handleBack}
@@ -44,6 +44,8 @@ export default function AboutDetail({ about }) {
         <span aria-hidden="true">&larr;</span>
       </Link>
 
+      {/* pt-20 clears the fixed back button below it on mobile — see
+          DetailView.jsx's identical fix for the full reasoning. */}
       <article
         className={`mx-auto w-full max-w-2xl px-2 sm:px-0 ${
           !reducedMotion && isExiting ? 'animate-detail-out' : ''

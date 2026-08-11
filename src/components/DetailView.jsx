@@ -66,7 +66,7 @@ export default function DetailView({ project }) {
   const linksReveal = linkEntries.length > 0 ? reveal() : null
 
   return (
-    <div className="min-h-screen bg-bg px-4 py-10 sm:py-16">
+    <div className="min-h-screen bg-bg px-4 pb-10 pt-20 sm:py-16">
       <Link
         to="/"
         onClick={handleBack}
@@ -76,6 +76,12 @@ export default function DetailView({ project }) {
         <span aria-hidden="true">&larr;</span>
       </Link>
 
+      {/* pt-20 (vs. sm:py-16's plain 4rem) clears the fixed back button below
+          it — button bottom edge sits at top-4 + h-10 = 3.5rem, and content
+          starts flush at the container's left edge too, so without the extra
+          clearance the byline/title's first line sat directly under the
+          button on mobile. Only needed below sm: the button moves out to
+          left-6/top-6 there and py-16 already clears it with room to spare. */}
       <article
         className={`mx-auto w-full max-w-7xl px-2 sm:px-0 ${
           !reducedMotion && isExiting ? 'animate-detail-out' : ''

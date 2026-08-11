@@ -116,13 +116,20 @@
 /* Hides a scroll container's native scrollbar chrome while leaving it fully
    scrollable (wheel, trackpad, touch, keyboard) — same technique as the
    page-level scrollbar above, reusable wherever a scroll affordance would
-   otherwise look like visual clutter. */
-.no-scrollbar {
-  scrollbar-width: none;
-}
+   otherwise look like visual clutter. Scoped to sm and up only: below that,
+   MiniArchitecture's diagrams are the one place a horizontal scrollbar is
+   the affordance rather than clutter — mobile's own thin auto-hiding
+   scrollbar is the standard, expected signal that a dense diagram (e.g.
+   PFAS's 9 columns) continues off-screen, and hiding it there was leaving
+   touch users with no indication there was more to scroll to. */
+@media (min-width: 640px) {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -41,10 +41,35 @@ export default function MiniArchitecture({ architecture, selectedId, onSelectNod
   const containerRef = useRef(null)
   const scrollRef = useRef(null)
   const [showHint, setShowHint] = useState(false)
+  // Whether there's more diagram off-screen to either side in the unzoomed
+  // view — drives the edge fades below. Real DOM measurement, not a
+  // viewport-size guess: a dense diagram (PFAS) can overflow even on a wide
+  // desktop window, and this only needs to reflect actual overflow.
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
 
   useEffect(() => {
     if (selectedId && scrollRef.current) scrollRef.current.scrollLeft = 0
   }, [selectedId])
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    const update = () => {
+      setCanScrollLeft(el.scrollLeft > 1)
+      setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1)
+    }
+
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    const resizeObserver = new ResizeObserver(update)
+    resizeObserver.observe(el)
+    return () => {
+      el.removeEventListener('scroll', update)
+      resizeObserver.disconnect()
+    }
+  }, [architecture])
 
   useEffect(() => {
     if (!selectedId) return
@@ -109,97 +134,125 @@ export default function MiniArchitecture({ architecture, selectedId, onSelectNod
 
   return (
     <div ref={containerRef}>
-      <div
-        ref={scrollRef}
-        className={`no-scrollbar relative overflow-y-hidden overscroll-x-contain ${
-          selectedNode ? 'overflow-x-hidden' : 'overflow-x-auto'
-        }`}
-      >
+      {/* This wrapper's only job is to give the unzoomed edge fades below a
+          box scoped to the scroll container's own height — anchoring them to
+          containerRef instead would stretch them down over the hint caption
+          underneath, since that's in containerRef's flow too. */}
+      <div className="relative">
         <div
-          className="grid w-max origin-center gap-x-1 gap-y-1 py-3 transition-transform duration-300 ease-out-quart"
-          style={{
-            gridTemplateColumns: `repeat(${totalCols}, minmax(0, auto))`,
-            gridTemplateRows: `repeat(${totalRows}, auto)`,
-            transform: `translate(${translateX}%, ${translateY}%) scale(${scale})`,
-          }}
+          ref={scrollRef}
+          className={`no-scrollbar relative overflow-y-hidden overscroll-x-contain ${
+            selectedNode ? 'overflow-x-hidden' : 'overflow-x-auto'
+          }`}
         >
-          {/* Node category/label and edge labels run below the page's caption
-              scale (0.55–0.65rem vs. text-caption's 0.7rem) on purpose — this
-              is the diagram's own dense micro-type, not page chrome, and
-              nodes are ~80px wide (w-20) with no room to grow into 0.7rem
-              without breaking the grid on PFAS's 9-column layout. */}
-          {nodes.map((n) => {
-            const isSelected = n.id === selectedId
-            const isBranch = n.row !== spineRow
-            const clickable = Boolean(n.description)
-            const Tag = clickable ? 'button' : 'div'
+          <div
+            className="grid w-max origin-center gap-x-1 gap-y-1 py-3 transition-transform duration-300 ease-out-quart"
+            style={{
+              gridTemplateColumns: `repeat(${totalCols}, minmax(0, auto))`,
+              gridTemplateRows: `repeat(${totalRows}, auto)`,
+              transform: `translate(${translateX}%, ${translateY}%) scale(${scale})`,
+            }}
+          >
+            {/* Node category/label and edge labels run below the page's caption
+                scale (0.55–0.65rem vs. text-caption's 0.7rem) on purpose — this
+                is the diagram's own dense micro-type, not page chrome, and
+                nodes are ~80px wide (w-20) with no room to grow into 0.7rem
+                without breaking the grid on PFAS's 9-column layout. */}
+            {nodes.map((n) => {
+              const isSelected = n.id === selectedId
+              const isBranch = n.row !== spineRow
+              const clickable = Boolean(n.description)
+              const Tag = clickable ? 'button' : 'div'
 
-            return (
-              <Tag
-                key={n.id}
-                type={clickable ? 'button' : undefined}
-                aria-pressed={clickable ? isSelected : undefined}
-                onClick={clickable ? () => onSelectNode(isSelected ? null : n) : undefined}
-                style={{
-                  gridColumn: toTrack(n.col),
-                  gridRow: toTrack(n.row),
-                }}
-                className={`flex w-20 flex-col items-center justify-center gap-1 rounded-sm border px-1.5 py-1.5 text-center transition-colors duration-150 ${
-                  isSelected ? 'border-accent' : 'border-border'
-                } ${!isSelected && isBranch ? 'border-dashed' : ''} ${
-                  clickable
-                    ? 'bg-bg hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent'
-                    : 'bg-bg'
-                }`}
-              >
-                {n.category && (
-                  <span className="font-body text-[0.55rem] font-semibold uppercase tracking-wide text-muted">
-                    {n.category}
+              return (
+                <Tag
+                  key={n.id}
+                  type={clickable ? 'button' : undefined}
+                  aria-pressed={clickable ? isSelected : undefined}
+                  onClick={clickable ? () => onSelectNode(isSelected ? null : n) : undefined}
+                  style={{
+                    gridColumn: toTrack(n.col),
+                    gridRow: toTrack(n.row),
+                  }}
+                  className={`flex w-20 flex-col items-center justify-center gap-1 rounded-sm border px-1.5 py-1.5 text-center transition-colors duration-150 ${
+                    isSelected ? 'border-accent' : 'border-border'
+                  } ${!isSelected && isBranch ? 'border-dashed' : ''} ${
+                    clickable
+                      ? 'bg-bg hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+                      : 'bg-bg'
+                  }`}
+                >
+                  {n.category && (
+                    <span className="font-body text-[0.55rem] font-semibold uppercase tracking-wide text-muted">
+                      {n.category}
+                    </span>
+                  )}
+                  <span className={`text-[0.65rem] font-medium leading-snug ${isBranch ? 'text-muted' : 'text-ink'}`}>
+                    {n.label}
                   </span>
-                )}
-                <span className={`text-[0.65rem] font-medium leading-snug ${isBranch ? 'text-muted' : 'text-ink'}`}>
-                  {n.label}
-                </span>
-              </Tag>
-            )
-          })}
+                </Tag>
+              )
+            })}
 
-          {edges.map((e) => {
-            const from = nodeById[e.from]
-            const to = nodeById[e.to]
-            if (!from || !to) return null
-            const horizontal = from.row === to.row
-            const gridColumn = horizontal ? 2 * Math.min(from.col, to.col) : toTrack(from.col)
-            const gridRow = horizontal ? toTrack(from.row) : 2 * Math.min(from.row, to.row)
-            const glyph = horizontal ? '→' : to.row > from.row ? '↓' : '↑'
-            const isBranch = from.row !== spineRow || to.row !== spineRow
+            {edges.map((e) => {
+              const from = nodeById[e.from]
+              const to = nodeById[e.to]
+              if (!from || !to) return null
+              const horizontal = from.row === to.row
+              const gridColumn = horizontal ? 2 * Math.min(from.col, to.col) : toTrack(from.col)
+              const gridRow = horizontal ? toTrack(from.row) : 2 * Math.min(from.row, to.row)
+              const glyph = horizontal ? '→' : to.row > from.row ? '↓' : '↑'
+              const isBranch = from.row !== spineRow || to.row !== spineRow
 
-            return (
-              <div
-                key={`${e.from}->${e.to}`}
-                style={{ gridColumn, gridRow }}
-                className={`flex w-10 flex-col items-center justify-center justify-self-center px-0.5 text-muted ${
-                  isBranch ? 'opacity-60' : ''
-                }`}
-              >
-                <span aria-hidden="true">{glyph}</span>
-                {e.label && <span className="text-center font-mono text-[0.55rem] leading-tight">{e.label}</span>}
-              </div>
-            )
-          })}
+              return (
+                <div
+                  key={`${e.from}->${e.to}`}
+                  style={{ gridColumn, gridRow }}
+                  className={`flex w-10 flex-col items-center justify-center justify-self-center px-0.5 text-muted ${
+                    isBranch ? 'opacity-60' : ''
+                  }`}
+                >
+                  <span aria-hidden="true">{glyph}</span>
+                  {e.label && <span className="text-center font-mono text-[0.55rem] leading-tight">{e.label}</span>}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Vignette over whatever the zoom clips at the edges — fades to the
+              page background rather than a hard cut, per DESIGN.md's flat/no-blur
+              rule (a soft opacity gradient, not an actual blur). Only shown while
+              zoomed; in the default 1x view nothing is cut off, so there's
+              nothing to soften. */}
+          {selectedNode && (
+            <>
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-bg to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-bg to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-bg to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-bg to-transparent" />
+            </>
+          )}
         </div>
 
-        {/* Vignette over whatever the zoom clips at the edges — fades to the
-            page background rather than a hard cut, per DESIGN.md's flat/no-blur
-            rule (a soft opacity gradient, not an actual blur). Only shown while
-            zoomed; in the default 1x view nothing is cut off, so there's
-            nothing to soften. */}
-        {selectedNode && (
+        {/* Unzoomed scroll-edge cues — real DOM measurement (canScrollLeft/
+            canScrollRight), not a viewport guess, so this only ever shows
+            where there's genuinely more diagram to scroll to. Same soft
+            gradient language as the zoom vignette above, not a new material.
+            Pairs with the mobile-only native scrollbar (see .no-scrollbar in
+            index.css) rather than replacing it — the gradient reads at a
+            glance, the scrollbar confirms exactly how much is left. */}
+        {!selectedNode && (
           <>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-bg to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-bg to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-bg to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-bg to-transparent" />
+            <div
+              className={`pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-bg to-transparent transition-opacity duration-200 ease-out-quart ${
+                canScrollLeft ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+            <div
+              className={`pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-bg to-transparent transition-opacity duration-200 ease-out-quart ${
+                canScrollRight ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
           </>
         )}
       </div>
