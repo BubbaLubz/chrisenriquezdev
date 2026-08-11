@@ -38,13 +38,13 @@
 }
 
 .animate-detail-in {
-  animation: detail-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: detail-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes detail-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -53,7 +53,38 @@
 }
 
 .animate-detail-out {
-  animation: detail-out 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: detail-out 0.13s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+/* Same duration/easing as .animate-detail-in, opacity only — no rise. For
+   elements where the translateY reads wrong, e.g. a dividing line/rule that
+   shouldn't look like it's sliding up into place. */
+.animate-fade-in {
+  animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Delays a .animate-detail-in element by --i steps — turns the single
+   fade+rise into a staggered sequence across sibling blocks. --i is set
+   inline per element (style={{ '--i': 0 }}, etc.). 90ms reads as one
+   deliberate entrance across a handful of large content blocks (detail-page
+   sections). For a row of many small cards, use .stagger-delay-fast (50ms —
+   the "list rhythm" cadence, see animate.md) instead so the total sequence
+   doesn't drag. */
+.stagger-delay {
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+
+.stagger-delay-fast {
+  animation-delay: calc(var(--i, 0) * 50ms);
 }
 
 @keyframes detail-out {
@@ -63,7 +94,7 @@
   }
   to {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
 }
 
@@ -99,6 +130,7 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;

@@ -1,7 +1,7 @@
 export default function UndercurrentsBand({ skills }) {
   return (
     <div className="border-t border-border pt-4">
-      <span className="block text-center font-body text-[0.7rem] uppercase tracking-wide text-muted">
+      <span className="block text-center font-body text-caption uppercase tracking-wide text-muted">
         Undercurrents
       </span>
       <ul className="mt-3 flex flex-wrap justify-center gap-2">

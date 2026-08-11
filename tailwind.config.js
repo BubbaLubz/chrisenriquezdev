@@ -19,6 +19,10 @@ export default {
       fontSize: {
         display: ['clamp(1.75rem, 3.5vw, 2.5rem)', { lineHeight: '1.15', letterSpacing: '-0.01em' }],
         headline: ['1.25rem', { lineHeight: '1.3' }],
+        title: ['1rem', { lineHeight: '1.3' }],
+        body: ['1rem', { lineHeight: '1.6' }],
+        label: ['0.7rem', { lineHeight: '1.4', letterSpacing: '0.03em', fontWeight: '500' }],
+        caption: ['0.7rem', { lineHeight: '1.4' }],
       },
       borderRadius: {
         sm: '4px',

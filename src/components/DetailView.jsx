@@ -1,6 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { stageBadgeConfig } from '../data/projects'
 import MiniArchitecture from './MiniArchitecture'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
@@ -10,7 +9,7 @@ const LINK_LABELS = {
 }
 
 // Matches .animate-detail-in/.animate-detail-out's duration in index.css.
-const EXIT_ANIMATION_MS = 220
+const EXIT_ANIMATION_MS = 130
 // How long the description crossfade takes to fade out before swapping content.
 const SWAP_FADE_MS = 180
 
@@ -21,7 +20,6 @@ export default function DetailView({ project }) {
   const [selectedNode, setSelectedNode] = useState(null) // what the diagram currently has picked
   const [displayedNode, setDisplayedNode] = useState(null) // what's actually rendered in the text area
   const [swapFading, setSwapFading] = useState(false)
-  const stage = stageBadgeConfig[project.stageBadge]
   const linkEntries = Object.entries(project.links ?? {})
   const paragraphs = Array.isArray(project.description) ? project.description : [project.description]
   const screenshots = project.screenshots ?? []
@@ -50,6 +48,23 @@ export default function DetailView({ project }) {
     }, SWAP_FADE_MS)
   }
 
+  // Reuses .animate-detail-in, staggered across this page's sections in
+  // reading order — same pattern as AboutDetail.jsx's bio reveal. Indices
+  // are assigned sequentially so an absent optional section (no
+  // architecture diagram, no screenshots) doesn't leave a gap in the
+  // sequence. Skipped entirely while exiting, same reasoning as AboutDetail.
+  let staggerIndex = 0
+  const reveal = () => {
+    if (reducedMotion || isExiting) return { className: '', style: undefined }
+    return { className: ' animate-detail-in stagger-delay', style: { '--i': staggerIndex++ } }
+  }
+  const headerReveal = reveal()
+  const architectureReveal = project.architecture ? reveal() : null
+  const descriptionReveal = reveal()
+  const screenshotsReveal = screenshots.length > 0 ? reveal() : null
+  const techStackReveal = project.techStack?.length > 0 ? reveal() : null
+  const linksReveal = linkEntries.length > 0 ? reveal() : null
+
   return (
     <div className="min-h-screen bg-bg px-4 py-10 sm:py-16">
       <Link
@@ -63,20 +78,19 @@ export default function DetailView({ project }) {
 
       <article
         className={`mx-auto w-full max-w-7xl px-2 sm:px-0 ${
-          reducedMotion ? '' : isExiting ? 'animate-detail-out' : 'animate-detail-in'
+          !reducedMotion && isExiting ? 'animate-detail-out' : ''
         }`}
       >
-        <div className="mx-auto max-w-2xl">
-          <div className="mb-3 flex flex-wrap items-baseline gap-3 font-body text-xs">
-            {stage && <span className="uppercase tracking-wide text-muted">{stage.label}</span>}
-            {project.company && <span className="text-muted">{project.company}</span>}
-          </div>
+        <div className={`mx-auto max-w-2xl${headerReveal.className}`} style={headerReveal.style}>
+          {project.company && (
+            <div className="mb-3 font-body text-caption text-muted">{project.company}</div>
+          )}
 
           <h1 className="text-balance text-display font-display font-semibold text-ink">{project.title}</h1>
         </div>
 
         {project.architecture && (
-          <div className="mt-6 flex justify-center">
+          <div className={`mt-6 flex justify-center${architectureReveal.className}`} style={architectureReveal.style}>
             <MiniArchitecture
               architecture={project.architecture}
               selectedId={selectedNode?.id ?? null}
@@ -86,34 +100,49 @@ export default function DetailView({ project }) {
         )}
 
         <div className="mx-auto max-w-2xl">
-          <div
-            className={`mt-6 max-w-[70ch] transition-opacity duration-200 ease-out-quart ${
-              swapFading ? 'opacity-0' : 'opacity-100'
-            }`}
-          >
-            {displayedNode ? (
-              <div>
-                <span className="block font-body text-[0.7rem] uppercase tracking-wide text-muted">
-                  {displayedNode.category ?? 'Component'}
-                </span>
-                <h2 className="mt-1 font-display text-headline font-semibold text-ink">{displayedNode.label}</h2>
-                <p className="mt-2 text-pretty font-body text-base leading-relaxed text-ink">
-                  {displayedNode.description}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {paragraphs.map((paragraph, i) => (
-                  <p key={i} className="text-pretty font-body text-base leading-relaxed text-ink">
-                    {paragraph}
+          {/* Split in two: the outer div plays the one-shot mount entrance,
+              the inner div owns the swapFading crossfade. Both controlled
+              the same element's opacity in the same div before, and once the
+              entrance's animation-fill-mode: both finished, it kept holding
+              opacity at 1 as an animation effect — which sits ABOVE the
+              cascade and silently overrode the inner opacity-0 class from
+              ever taking visual effect. Separating them means the entrance
+              animation only ever touches the outer wrapper, so it's done and
+              out of the way well before a node click can trigger the inner
+              crossfade. */}
+          <div className={descriptionReveal.className.trim()} style={descriptionReveal.style}>
+            <div
+              className={`mt-6 max-w-[70ch] transition-opacity duration-200 ease-out-quart ${
+                swapFading ? 'opacity-0' : 'opacity-100'
+              }`}
+            >
+              {displayedNode ? (
+                <div>
+                  <span className="block font-body text-caption uppercase tracking-wide text-muted">
+                    {displayedNode.category ?? 'Component'}
+                  </span>
+                  <h2 className="mt-1 font-display text-headline font-semibold text-ink">{displayedNode.label}</h2>
+                  <p className="mt-2 text-pretty font-body text-body text-ink">
+                    {displayedNode.description}
                   </p>
-                ))}
-              </div>
-            )}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {paragraphs.map((paragraph, i) => (
+                    <p key={i} className="text-pretty font-body text-body text-ink">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {screenshots.length > 0 && (
-            <div className={`mt-6 grid gap-4 ${screenshots.length > 1 ? 'sm:grid-cols-2' : 'grid-cols-1'}`}>
+            <div
+              className={`mt-6 grid gap-4 ${screenshots.length > 1 ? 'sm:grid-cols-2' : 'grid-cols-1'}${screenshotsReveal.className}`}
+              style={screenshotsReveal.style}
+            >
               {screenshots.map((shot) => (
                 <img
                   key={shot.src}
@@ -127,11 +156,15 @@ export default function DetailView({ project }) {
           )}
 
           {project.techStack?.length > 0 && (
-            <ul className="mt-6 flex flex-wrap gap-2" aria-label="Tech stack">
+            <ul
+              className={`mt-6 flex flex-wrap gap-2${techStackReveal.className}`}
+              style={techStackReveal.style}
+              aria-label="Tech stack"
+            >
               {project.techStack.map((t) => (
                 <li
                   key={t}
-                  className="rounded-sm border border-border px-2 py-0.5 font-mono text-[0.7rem] text-muted"
+                  className="rounded-sm border border-border px-2 py-0.5 font-mono text-label text-muted"
                 >
                   {t}
                 </li>
@@ -140,7 +173,7 @@ export default function DetailView({ project }) {
           )}
 
           {linkEntries.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+            <div className={`mt-6 flex flex-wrap gap-x-6 gap-y-2${linksReveal.className}`} style={linksReveal.style}>
               {linkEntries.map(([key, href]) => (
                 <a key={key} href={href} target="_blank" rel="noreferrer" className="font-body text-sm text-ink">
                   {LINK_LABELS[key] ?? key}

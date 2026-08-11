@@ -9,7 +9,7 @@ export const projects = [
     company: 'Independent project',
     stageBadge: 'ingestion',
     description:[
-      'Think Spotify wrapped, but for your entire listening history.',
+      'Spotify wrapped, but for your entire listening history.',
       'An event-driven AWS pipeline ingesting 165k+ ListenBrainz listening events through Kafka, with 30-minute polling and at-least-once delivery guaranteed via offset-after-write commits. Checkpoint-based and Redis deduplication kept the 30-minute poll cycles from reprocessing anything already ingested. Terraform provisioned the infrastructure, including a 1GB-per-query Athena cost guardrail and a 90-day S3 lifecycle policy on raw data.',
     ],
     techStack: ['Python', 'AWS Lambda', 'Kafka', 'Athena', 'dbt', 'Grafana', 'Terraform'],
@@ -120,7 +120,7 @@ export const projects = [
   },
   {
     id: 'sticksplit',
-    title: 'StickSplit',
+    title: 'CV Drumming Analytics Tool',
     company: 'KiroHacks 2026',
     stageBadge: 'serving',
     description:
@@ -144,7 +144,7 @@ export const projects = [
   },
   {
     id: 'pfas-reporting-layer',
-    title: 'PFAS Analytic Pipeline',
+    title: 'PFAS Sample Analytics Pipeline',
     company: 'EKI Environment and Water Inc., Jan 2026 — Jun 2026',
     stageBadge: 'transformation',
     description: [

@@ -1,4 +1,4 @@
-<!-- Rewritten from the dark/cinematic v1 after user feedback: "too moody and dev-tool-coded... trying too hard to impress." Replaced with a near-monochrome, quiet system built around the real, literal data engineering lifecycle diagram (Reis & Housley) rather than an invented visual metaphor. Colors/typography verified (contrast measured in-browser, not asserted) — components section still pending a full /impeccable document scan once the rebuild settles. -->
+<!-- Rewritten from the dark/cinematic v1 after user feedback: "too moody and dev-tool-coded... trying too hard to impress." Replaced with a near-monochrome, quiet system built around the real, literal data engineering lifecycle diagram (Reis & Housley) rather than an invented visual metaphor. Colors/typography verified (contrast measured in-browser, not asserted). A /impeccable typeset pass reconciled this doc's type scale against the actual component code: title/body/label/caption are now real Tailwind fontSize tokens (they previously existed only here, and components approximated them with ad hoc text-sm/text-xs/text-[Npx] values that had drifted from these specs). -->
 
 ---
 name: "Christopher Enriquez — Data Engineering Portfolio"
@@ -38,6 +38,12 @@ typography:
     fontWeight: 500
     lineHeight: 1.4
     letterSpacing: "0.03em"
+  caption:
+    fontFamily: "General Sans, sans-serif"
+    fontSize: "0.7rem"
+    fontWeight: 400
+    lineHeight: 1.4
+    letterSpacing: "0.025em"
 rounded:
   sm: "4px"
   md: "8px"
@@ -88,10 +94,15 @@ Near-monochrome strategy, one step more restrained than "Restrained": white/blac
 
 ### Hierarchy
 - **Display** (General Sans 600, `clamp(1.75rem, 3.5vw, 2.5rem)`, line-height 1.15): project titles in the detail view.
-- **Headline** (General Sans 600, 1.25rem): section headers ("Architecture", stage box titles at diagram scale).
-- **Title** (General Sans 600, 1rem): diagram box labels, card titles.
-- **Body** (General Sans 400, 1rem, line-height 1.6, max 65–75ch): descriptions.
-- **Label** (JetBrains Mono 500, 0.7rem): tech-stack tags — the one remaining mono use in the whole system.
+- **Headline** (General Sans 600, 1.25rem): section headers ("Architecture", detail-view node titles).
+- **Title** (General Sans 600, 1rem, line-height 1.3): stage box titles, output card titles.
+- **Body** (General Sans 400, 1rem, line-height 1.6, max 65–75ch): descriptions, the About card's bio.
+- **Label** (JetBrains Mono 500, 0.7rem, line-height 1.4, tracking 0.03em): tech-stack tags — the one remaining mono use in the whole system.
+- **Caption** (General Sans 400, 0.7rem, line-height 1.4, `tracking-wide` applied separately): the uppercase eyebrow role — section labels ("Generation", "Output", "Undercurrents"), stage badges, byline metadata.
+
+All six map to real Tailwind `fontSize` tokens (`text-display`/`text-headline`/`text-title`/`text-body`/`text-label`/`text-caption` in `tailwind.config.js`) — weight and `uppercase`/`tracking-wide` stay as separate utility classes on top of the token, since those vary by usage (e.g. Caption is plain-weight as a section label but the Output cards additionally apply `group-hover:text-accent`).
+
+**Exception, by design**: `MiniArchitecture`'s internal node category (0.55rem), node label (0.65rem), and edge label (0.55rem) run below the Caption token on purpose — that's the embedded diagram's own dense micro-type, constrained by ~80px-wide nodes on layouts up to 9 columns wide (PFAS), not page chrome. Don't fold these into Caption; forcing them to 0.7rem would overflow the grid.
 
 ### Named Rules
 **The Mono-Is-Rare Rule.** Monospace appears only on tech-stack tags. Everywhere v1 used it by reflex (dates, stage badges, metadata) now uses General Sans at a smaller size or lighter weight instead — mono stopped being "the technical voice" and started being wallpaper; pulling it back to one real use restores its meaning.

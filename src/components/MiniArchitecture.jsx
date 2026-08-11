@@ -123,6 +123,11 @@ export default function MiniArchitecture({ architecture, selectedId, onSelectNod
             transform: `translate(${translateX}%, ${translateY}%) scale(${scale})`,
           }}
         >
+          {/* Node category/label and edge labels run below the page's caption
+              scale (0.55–0.65rem vs. text-caption's 0.7rem) on purpose — this
+              is the diagram's own dense micro-type, not page chrome, and
+              nodes are ~80px wide (w-20) with no room to grow into 0.7rem
+              without breaking the grid on PFAS's 9-column layout. */}
           {nodes.map((n) => {
             const isSelected = n.id === selectedId
             const isBranch = n.row !== spineRow
@@ -207,7 +212,7 @@ export default function MiniArchitecture({ architecture, selectedId, onSelectNod
           extra node instead of a caption. */}
       <div
         aria-hidden="true"
-        className={`mt-2 flex justify-center font-body text-[0.7rem] uppercase tracking-wide text-muted transition-opacity duration-200 ease-out-quart ${
+        className={`mt-2 flex justify-center font-body text-caption uppercase tracking-wide text-muted transition-opacity duration-200 ease-out-quart ${
           showHint ? 'opacity-100' : 'opacity-0'
         }`}
       >
