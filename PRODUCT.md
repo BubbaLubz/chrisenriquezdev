@@ -42,4 +42,6 @@ Show, don't tell: the interface itself is the evidence of skill, not a claim pri
 
 ## Accessibility & Inclusion
 
-WCAG 2.1 AA contrast throughout (4.5:1 body text, 3:1 large text/UI). Full keyboard navigation with visible focus states. `prefers-reduced-motion` fallback required for the faint connector animation and any transitions — crossfade or instant transition in place of motion.
+WCAG 2.1 AA contrast throughout (4.5:1 body text, 3:1 large text/UI). Full keyboard navigation with visible focus states. `prefers-reduced-motion` fallback required for the faint connector animation, the entrance-reveal system, and any transitions — crossfade or instant transition in place of motion.
+
+**Mobile diagram access**: the per-project architecture diagrams (`MiniArchitecture.jsx`) are fully scrollable on both axes on mobile in every state, including zoomed into a node — nothing is ever permanently out of reach just because a diagram is dense (e.g. PFAS's 9 columns) or a phone screen is narrow. This was a direct fix following a report that the diagram was unscrollable in one direction on mobile; see CLAUDE.md's Per-Project Architecture Diagrams section for the mechanism.

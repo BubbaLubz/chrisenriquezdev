@@ -1,4 +1,4 @@
-<!-- Rewritten from the dark/cinematic v1 after user feedback: "too moody and dev-tool-coded... trying too hard to impress." Replaced with a near-monochrome, quiet system built around the real, literal data engineering lifecycle diagram (Reis & Housley) rather than an invented visual metaphor. Colors/typography verified (contrast measured in-browser, not asserted). A /impeccable typeset pass reconciled this doc's type scale against the actual component code: title/body/label/caption are now real Tailwind fontSize tokens (they previously existed only here, and components approximated them with ad hoc text-sm/text-xs/text-[Npx] values that had drifted from these specs). -->
+<!-- Rewritten from the dark/cinematic v1 after user feedback: "too moody and dev-tool-coded... trying too hard to impress." Replaced with a near-monochrome, quiet system built around the real, literal data engineering lifecycle diagram (Reis & Housley) rather than an invented visual metaphor. Colors/typography verified (contrast measured in-browser, not asserted). A /impeccable typeset pass reconciled this doc's type scale against the actual component code: title/body/label/caption are now real Tailwind fontSize tokens (they previously existed only here, and components approximated them with ad hoc text-sm/text-xs/text-[Npx] values that had drifted from these specs). A later session added a real Motion section documenting the site-wide staggered entrance-animation system (one shared keyframe, two delay cadences) — see Motion below; CLAUDE.md's "Read this first" has the full session writeup including two related bugs (fill-mode: both silently overriding both a runtime opacity toggle and, separately, corrupting a scrollable descendant's scroll bounds). -->
 
 ---
 name: "Christopher Enriquez — Data Engineering Portfolio"
@@ -62,7 +62,7 @@ Not an invented metaphor — the actual data engineering lifecycle diagram, the 
 - One quiet accent (muted slate-blue), spent on exactly one thing: the hover/active/selected state of a box (a main-diagram stage, or a node in a per-project architecture diagram). Connector lines were tried in Signal Blue and explicitly reverted back to neutral gray — see the Colors section below.
 - Single type family (General Sans) for everything except tech-stack tags, which alone keep the monospace face — reserved, not a background texture
 - Flat by default — no shadows, no glow, no blur anywhere in this version (the prior system's "one glass rule" is gone entirely; there's no floating panel left that needs it)
-- Motion is minimal on purpose: a faint, slow pulse on the stage-to-stage connectors (barely perceptible, "a heartbeat, not a demo effect" — direct instruction), nothing else animates on its own
+- Motion is minimal on purpose: a faint, slow pulse on the stage-to-stage connectors (barely perceptible, "a heartbeat, not a demo effect" — direct instruction), plus a one-shot page-entrance choreography — see Motion below for the full system
 
 ## Colors
 
@@ -107,6 +107,21 @@ All six map to real Tailwind `fontSize` tokens (`text-display`/`text-headline`/`
 ### Named Rules
 **The Mono-Is-Rare Rule.** Monospace appears only on tech-stack tags. Everywhere v1 used it by reflex (dates, stage badges, metadata) now uses General Sans at a smaller size or lighter weight instead — mono stopped being "the technical voice" and started being wallpaper; pulling it back to one real use restores its meaning.
 
+## Motion
+
+One shared entrance keyframe (`detail-in` in `index.css` — fade + 12px rise, `cubic-bezier(0.16, 1, 0.3, 1)`, 0.6s) drives every page-load reveal on the site. Nothing invents a new easing curve or a new motion material for this; the vocabulary stays deliberately small.
+
+- **`.stagger-delay`** (90ms/step): for a handful of large sections — a detail page's byline/title, architecture diagram, description, screenshots, tech stack, links. Reads as one deliberate, hero-moment entrance.
+- **`.stagger-delay-fast`** (50ms/step): for a row of many small cards — the homepage's Generation → stages → Output → Undercurrents, staggering left-to-right in on-screen order. The "list rhythm" cadence (see the SKILL's animate guidance): fast enough that many items don't drag the total sequence out.
+- **`.animate-fade-in`** (opacity only, same duration/easing, no rise): for the one element where a translateY reads wrong — the Undercurrents band, whose entrance *is* its own dividing rule (`border-t`) fading in above the tag row. A rise there looked like the line sliding upward into place, which isn't what a static horizontal rule should do.
+- Both delay classes read `--i` (an inline custom property, `style={{ '--i': index }}`) via `calc(var(--i, 0) * <step>)` — set the index in JS, not in a hardcoded class name, so the sequence stays correct even when sections are conditionally present (see `DetailView.jsx`'s running `staggerIndex`, which skips absent optional sections rather than leaving a gap).
+- Every one of these fires once on mount and never again — no scroll-triggered replay, no hover micro-interaction added on top. Consistent with the brand's "one well-rehearsed entrance beats scattered micro-interactions" stance (see PRODUCT.md's Design Principles).
+
+### Named Rules
+**The One-Keyframe Rule.** New entrance moments reuse `detail-in` (or its fade-only sibling `fade-in`) via a delay class — they don't get their own bespoke `@keyframes`. If a new element's entrance genuinely can't be expressed as "fade, optionally with a 12px rise, optionally delayed," that's a signal to reconsider the moment, not to add a third keyframe.
+
+**Gotcha, not a rule but worth knowing**: `animation-fill-mode: both` holds an animation's end state *forever* once it finishes, as an active animation effect that sits above the normal cascade — not just a specified value that other CSS can freely override afterward. Two real bugs came from this: a runtime opacity toggle on the same element as a finished entrance animation stopped working (the finished animation kept winning), and a finished entrance animation's no-op `transform: translateY(0)` corrupted a scrollable descendant's scroll-bounds computation. Rule of thumb: never share an element between a one-shot entrance animation and either (a) an ongoing state-driven style toggle on the same property, or (b) a descendant that manages its own scroll — split the entrance onto its own wrapper, and once mobile scroll used it, strip the animation classes after settling.
+
 ## Elevation
 
 Flat. No shadows, no blur, anywhere in this version. Separation between elements comes entirely from Border and the rare Surface lift — never from a shadow implying depth or glow implying light.
@@ -122,6 +137,7 @@ Flat. No shadows, no blur, anywhere in this version. Separation between elements
 - **Do** use General Sans for every date, badge, and label that v1 put in mono — mono is earned only by tech-stack tags now.
 - **Do** keep the connector animation faint and slow enough that a visitor has to look for it, not fast enough that it looks for them.
 - **Do** provide a `prefers-reduced-motion` fallback for the connector pulse and any transitions, per PRODUCT.md's Accessibility section.
+- **Do** reuse `detail-in`/`fade-in` + a delay class for any new entrance moment, per the One-Keyframe Rule — see Motion above.
 
 ### Don't:
 - **Don't** add box-shadow glow, blur, or an atmospheric background — the No-Glow Rule is a direct response to what didn't work in v1.
@@ -129,3 +145,4 @@ Flat. No shadows, no blur, anywhere in this version. Separation between elements
 - **Don't** make the diagram draggable or let boxes leave their canonical position — the recognizability of the real lifecycle diagram is the entire point, and a scrambled diagram loses it.
 - **Don't** add a floating chrome element (mini-map, persistent shortcut button) that isn't already part of the diagram itself — Resume/Contact/Links are now Output boxes in the diagram, not separate UI.
 - **Don't** revert to the amber/dark-cinematic direction (v1) or the original light-editorial/indigo direction (v0) — both are documented in CLAUDE.md as historical only.
+- **Don't** put a one-shot entrance animation and an ongoing state-driven style toggle (or a scrollable descendant) on the same element — `fill-mode: both` holds the animation's end state forever and will silently win. See Motion's gotcha note above.
