@@ -4,8 +4,9 @@ import MiniArchitecture from './MiniArchitecture'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
 const LINK_LABELS = {
-  repo: 'View repository',
-  demo: 'View live demo',
+  website: 'View Website',
+  repo: 'View Repository',
+  demo: 'View Live Demo',
 }
 
 // Matches .animate-detail-in/.animate-detail-out's duration in index.css.

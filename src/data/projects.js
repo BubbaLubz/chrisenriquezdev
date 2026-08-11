@@ -139,7 +139,7 @@ export const projects = [
       ],
         techStack: ['TypeScript', 'React', 'ReactFlow', 'Dagre', 'Anthropic API', 'Supabase'],
     links: {
-      repo: 'https://github.com/BubbaLubz/DEDiagram',
+      website: 'https://dediagram.onrender.com/',
     },
   },
   {

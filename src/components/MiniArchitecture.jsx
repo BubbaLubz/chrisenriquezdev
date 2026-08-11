@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 // A small, read-only rendering of a project's real architecture — a hand-placed
 // CSS grid, not an auto-layout graph engine (same philosophy as the main
@@ -21,55 +21,78 @@ import { useEffect, useRef, useState } from 'react'
 // selection up to the parent for the description crossfade); clicking it
 // again, or clicking anywhere that isn't a node button, zooms back out.
 //
-// The outer wrapper clips vertically (overflow-y-hidden) at its natural
-// size, so a zoomed neighbor running off the top/bottom edge is intentional
-// — the vignette fades it out rather than showing a hard cut. Horizontally
-// it's scrollable (overflow-x-auto) in the unzoomed state only: a dense
-// diagram (PFAS's 9 columns) is wider than a narrow viewport can show at a
-// readable size, and shrinking node/font size to force-fit a phone screen
-// would make it unreadable rather than solving anything — scrolling to a
-// fixed, legible size is the better trade. Chrome includes an element's own
-// transform in its ancestor's scrollable-overflow calculation, so leaving
-// overflow-x: auto on during the zoomed (scaled) state would surface a
-// scrollbar for the zoom's intentional overflow too — that's switched to
-// hidden while a node is selected, restoring the plain clip-and-vignette
-// zoom behavior, and scroll position resets to 0 on zoom-in so it's always
-// centered regardless of where the unzoomed view had been scrolled.
+// Below sm, the container is freely scrollable on both axes in every state
+// (unzoomed AND zoomed) — nothing is ever permanently clipped on a phone;
+// panning reaches every node regardless of screen size. At sm and up it
+// keeps the original desktop treatment instead: horizontally scrollable
+// (overflow-x-auto) only in the unzoomed state — a dense diagram (PFAS's 9
+// columns) is wider than a narrow viewport can show at a readable size, and
+// shrinking node/font size to force-fit it would make it unreadable rather
+// than solving anything, so scrolling to a fixed, legible size is the
+// better trade — and vertically clipped (overflow-y-hidden) always, with a
+// zoomed neighbor running off the top/bottom edge fading out via vignette
+// rather than a hard cut. Chrome includes an element's own transform in its
+// ancestor's scrollable-overflow calculation, so leaving overflow-x: auto
+// on during the desktop zoomed (scaled) state would surface a scrollbar for
+// the zoom's intentional overflow too — that's switched to hidden there
+// while a node is selected. Scroll position resets to 0/0 on zoom-in either
+// way, so the zoom always starts centered regardless of where the unzoomed
+// view had been scrolled.
 const ZOOM_SCALE = 2.1
 
 export default function MiniArchitecture({ architecture, selectedId, onSelectNode }) {
   const containerRef = useRef(null)
   const scrollRef = useRef(null)
   const [showHint, setShowHint] = useState(false)
-  // Whether there's more diagram off-screen to either side in the unzoomed
-  // view — drives the edge fades below. Real DOM measurement, not a
-  // viewport-size guess: a dense diagram (PFAS) can overflow even on a wide
-  // desktop window, and this only needs to reflect actual overflow.
+  // Whether there's more diagram off-screen in each direction — drives the
+  // edge fades below. Real DOM measurement, not a viewport-size guess: a
+  // dense diagram (PFAS) can overflow horizontally even on a wide desktop
+  // window, and this only needs to reflect actual overflow. Up/down only
+  // ever go true on mobile (or on desktop while zoomed, where they're
+  // measured but not rendered — see the fade JSX below).
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
+  const [canScrollUp, setCanScrollUp] = useState(false)
+  const [canScrollDown, setCanScrollDown] = useState(false)
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    setCanScrollLeft(el.scrollLeft > 1)
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1)
+    setCanScrollUp(el.scrollTop > 1)
+    setCanScrollDown(el.scrollTop < el.scrollHeight - el.clientHeight - 1)
+  }, [])
 
   useEffect(() => {
-    if (selectedId && scrollRef.current) scrollRef.current.scrollLeft = 0
+    if (selectedId && scrollRef.current) {
+      scrollRef.current.scrollLeft = 0
+      scrollRef.current.scrollTop = 0
+    }
   }, [selectedId])
 
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
 
-    const update = () => {
-      setCanScrollLeft(el.scrollLeft > 1)
-      setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1)
-    }
-
-    update()
-    el.addEventListener('scroll', update, { passive: true })
-    const resizeObserver = new ResizeObserver(update)
+    updateScrollState()
+    el.addEventListener('scroll', updateScrollState, { passive: true })
+    const resizeObserver = new ResizeObserver(updateScrollState)
     resizeObserver.observe(el)
     return () => {
-      el.removeEventListener('scroll', update)
+      el.removeEventListener('scroll', updateScrollState)
       resizeObserver.disconnect()
     }
-  }, [architecture])
+  }, [architecture, updateScrollState])
+
+  // The zoom transform changes scrollWidth/scrollHeight without changing the
+  // container's own box size, so the ResizeObserver above never sees it —
+  // recompute once the 300ms transform transition (see the grid's
+  // duration-300 below) has settled.
+  useEffect(() => {
+    const t = setTimeout(updateScrollState, 320)
+    return () => clearTimeout(t)
+  }, [selectedId, updateScrollState])
 
   useEffect(() => {
     if (!selectedId) return
@@ -141,8 +164,8 @@ export default function MiniArchitecture({ architecture, selectedId, onSelectNod
       <div className="relative">
         <div
           ref={scrollRef}
-          className={`no-scrollbar relative overflow-y-hidden overscroll-x-contain ${
-            selectedNode ? 'overflow-x-hidden' : 'overflow-x-auto'
+          className={`no-scrollbar relative overflow-auto overscroll-contain sm:overflow-y-hidden ${
+            selectedNode ? 'sm:overflow-x-hidden' : 'sm:overflow-x-auto'
           }`}
         >
           <div
@@ -219,42 +242,59 @@ export default function MiniArchitecture({ architecture, selectedId, onSelectNod
             })}
           </div>
 
-          {/* Vignette over whatever the zoom clips at the edges — fades to the
-              page background rather than a hard cut, per DESIGN.md's flat/no-blur
-              rule (a soft opacity gradient, not an actual blur). Only shown while
-              zoomed; in the default 1x view nothing is cut off, so there's
-              nothing to soften. */}
+          {/* Desktop-only: vignette over whatever the zoom clips at the
+              edges — fades to the page background rather than a hard cut,
+              per DESIGN.md's flat/no-blur rule (a soft opacity gradient, not
+              an actual blur). Below sm the zoomed state is genuinely
+              scrollable instead of clipped (see the container's overflow
+              classes above), so a static "this is cut off" vignette would
+              be actively misleading there — the dynamic, scroll-aware fades
+              below take over on mobile instead, in all four directions. */}
           {selectedNode && (
             <>
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-bg to-transparent" />
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-bg to-transparent" />
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-bg to-transparent" />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-bg to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-10 bg-gradient-to-r from-bg to-transparent sm:block" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-10 bg-gradient-to-l from-bg to-transparent sm:block" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 hidden h-10 bg-gradient-to-b from-bg to-transparent sm:block" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-10 bg-gradient-to-t from-bg to-transparent sm:block" />
             </>
           )}
         </div>
 
-        {/* Unzoomed scroll-edge cues — real DOM measurement (canScrollLeft/
-            canScrollRight), not a viewport guess, so this only ever shows
-            where there's genuinely more diagram to scroll to. Same soft
-            gradient language as the zoom vignette above, not a new material.
-            Pairs with the mobile-only native scrollbar (see .no-scrollbar in
-            index.css) rather than replacing it — the gradient reads at a
-            glance, the scrollbar confirms exactly how much is left. */}
-        {!selectedNode && (
-          <>
-            <div
-              className={`pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-bg to-transparent transition-opacity duration-200 ease-out-quart ${
-                canScrollLeft ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-            <div
-              className={`pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-bg to-transparent transition-opacity duration-200 ease-out-quart ${
-                canScrollRight ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-          </>
-        )}
+        {/* Scroll-edge cues — real DOM measurement (canScrollLeft/Right/Up/
+            Down), not a viewport guess, so each only ever lights up where
+            there's genuinely more diagram to scroll to. Same soft gradient
+            language as the desktop zoom vignette above, not a new material.
+            Left/right stay live in every state on every viewport (pairs
+            with the mobile-only native scrollbar, see .no-scrollbar in
+            index.css, as a second, always-visible cue); they're suppressed
+            on desktop specifically while zoomed (sm:hidden) since that
+            state uses the static vignette above instead — overflow-x is
+            hidden there, so "can scroll" would be true but wouldn't
+            actually work. Top/bottom are mobile-only (sm:hidden
+            unconditionally): desktop never scrolls vertically in any state,
+            so the static vignette is always the right cue there instead;
+            on mobile they stay inactive until zooming actually produces
+            vertical overflow to scroll through. */}
+        <div
+          className={`pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-bg to-transparent transition-opacity duration-200 ease-out-quart ${
+            canScrollLeft ? 'opacity-100' : 'opacity-0'
+          } ${selectedNode ? 'sm:hidden' : ''}`}
+        />
+        <div
+          className={`pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-bg to-transparent transition-opacity duration-200 ease-out-quart ${
+            canScrollRight ? 'opacity-100' : 'opacity-0'
+          } ${selectedNode ? 'sm:hidden' : ''}`}
+        />
+        <div
+          className={`pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-bg to-transparent transition-opacity duration-200 ease-out-quart sm:hidden ${
+            canScrollUp ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+        <div
+          className={`pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-bg to-transparent transition-opacity duration-200 ease-out-quart sm:hidden ${
+            canScrollDown ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
       </div>
 
       {/* In normal flow below the scrollable diagram, not overlaid on top of
