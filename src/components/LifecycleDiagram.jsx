@@ -58,9 +58,6 @@ export default function LifecycleDiagram() {
             <GenerationCard about={about} />
           </div>
 
-          <div className="flex justify-center md:hidden">
-            <Connector direction="vertical" />
-          </div>
           <span className="hidden shrink-0 md:block">
             <Connector direction="horizontal" />
           </span>
@@ -70,17 +67,11 @@ export default function LifecycleDiagram() {
               <div className={`sm:flex-1${reveal(1)}`} style={revealStyle(1)}>
                 {ingestion && <StageBox project={ingestion} />}
               </div>
-              <div className="flex justify-center sm:hidden">
-                <Connector direction="vertical" />
-              </div>
               <div className="hidden items-center justify-center sm:flex">
                 <Connector direction="horizontal" />
               </div>
               <div className={`sm:flex-1${reveal(2)}`} style={revealStyle(2)}>
                 {transformation && <StageBox project={transformation} />}
-              </div>
-              <div className="flex justify-center sm:hidden">
-                <Connector direction="vertical" />
               </div>
               <div className="hidden items-center justify-center sm:flex">
                 <Connector direction="horizontal" />
@@ -95,9 +86,6 @@ export default function LifecycleDiagram() {
             </div>
           </div>
 
-          <div className="flex justify-center md:hidden">
-            <Connector direction="vertical" />
-          </div>
           <span className="hidden shrink-0 md:block">
             <Connector direction="horizontal" />
           </span>
