@@ -16,7 +16,7 @@ export const about = {
   email: 'mailto:chris.fog.city@gmail.com',
   experience: [
     { title: 'B.S. Interdisciplinary Studies (CS + Music minors) — Cal Poly SLO', dateRange: 'Expected Jun 2028' },
-    { title: 'Data Engineering Lead — Cal Poly Systems Optimizations Club', dateRange: 'Sep 2026 — Present' },
-    { title: 'Data Engineering Lead — EKI Environment and Water Inc.', dateRange: 'Jan 2026 — Jun 2026' },
+    { title: 'Data Engineering Lead & Assistant Project Lead — Cal Poly Systems Optimizations Club', dateRange: 'Sep 2026 — Present' },
+    { title: 'Data Engineering Consultant — EKI Environment and Water Inc.', dateRange: 'Jan 2026 — Jun 2026' },
   ],
 }
