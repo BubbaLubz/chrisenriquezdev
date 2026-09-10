@@ -121,11 +121,11 @@ export const projects = [
   {
     id: 'vendor-analytics-dashboard',
     title: 'Payment & Vendor Analytics Dashboard',
-    company: 'Cal Poly Systems Optimizations Club, Sep 2026 — Present',
+    company: 'Cal Poly Systems Optimizations Club · Ataa Pay, Sep 2026 — Present',
     stageBadge: 'serving',
     description: [
-      'A map-based analytics dashboard for a South African payment and social welfare platform.',
-      "As data engineering lead, I'm architecting the system design and scoping the technical requirements for a Python pipeline that scrapes participating vendor websites, lands raw and enriched records in an AWS S3 data lake, and enriches each vendor with geocoding data from OpenStreetMap and topography APIs. That pipeline powers a map-based dashboard that plots vendor locations across the platform.",
+      'A Cal Poly Systems Optimizations Club project, built for Ataa Pay, a South African payment and social welfare platform. It powers a map-based analytics dashboard that plots participating vendors.',
+      "As data engineering lead, I'm architecting the system design and scoping the technical requirements for a Python pipeline that scrapes participating vendor websites, lands raw and enriched records in an AWS S3 data lake, and enriches each vendor with geocoding data from OpenStreetMap and topography APIs. That pipeline powers the map-based dashboard that plots vendor locations across the platform.",
       "I'm also designing the geocode enrichment process itself, standardizing inconsistent vendor location data into a canonical form so it maps consistently. Its validation layer runs Great Expectations checks on the enriched records, with semantic validation via the Anthropic and OpenAI APIs as a fallback when fuzzy matching can't confidently resolve a location.",
       'As assistant project lead, I also delegate technical tasks across the team, coordinating the scraping, enrichment, dashboard integration, and the other work streams.',
     ],
