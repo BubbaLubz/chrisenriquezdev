@@ -125,9 +125,9 @@ export const projects = [
     stageBadge: 'serving',
     description: [
       'A map-based analytics dashboard for a South African payment and social welfare platform.',
-      "As data engineering lead, I'm architecting the system design and scoping the technical requirements for a Python pipeline that scrapes participating vendor websites, lands raw and enriched records in an AWS S3 data lake, and enriches each vendor with geocoding data from OpenStreetMap and topography APIs — powering a map-based dashboard that plots vendor locations across the platform.",
-      "I'm designing the geocode enrichment process itself — standardizing inconsistent vendor location data into a canonical form so it maps consistently — including its validation layer: Great Expectations checks on the enriched records, with semantic validation via the Anthropic and OpenAI APIs as a fallback when fuzzy matching can't confidently resolve a location.",
-      'As assistant project lead, I also delegate technical tasks across the team — coordinating the scraping, enrichment, dashboard integration, and the other work streams.',
+      "As data engineering lead, I'm architecting the system design and scoping the technical requirements for a Python pipeline that scrapes participating vendor websites, lands raw and enriched records in an AWS S3 data lake, and enriches each vendor with geocoding data from OpenStreetMap and topography APIs. That pipeline powers a map-based dashboard that plots vendor locations across the platform.",
+      "I'm also designing the geocode enrichment process itself, standardizing inconsistent vendor location data into a canonical form so it maps consistently. Its validation layer runs Great Expectations checks on the enriched records, with semantic validation via the Anthropic and OpenAI APIs as a fallback when fuzzy matching can't confidently resolve a location.",
+      'As assistant project lead, I also delegate technical tasks across the team, coordinating the scraping, enrichment, dashboard integration, and the other work streams.',
     ],
     techStack: ['Python', 'AWS S3', 'OpenStreetMap API', 'Great Expectations', 'Anthropic API', 'OpenAI API'],
     links: {},
