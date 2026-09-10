@@ -153,7 +153,7 @@ export const projects = [
     company: 'EKI Environment and Water Inc., Jan 2026 — Jun 2026',
     stageBadge: 'transformation',
     description: [
-      '(Via Cal Poly Systems Optimization Club.)',
+      '(Via Cal Poly Systems Optimizations Club.)',
       "Nationwide sample analysis on man-made carcineogens.",
       "Built a data integration and standardization pipeline that ingests messy, inconsistent PFAS water-quality datasets from federal and state agencies and normalizes them at scale — resolving 1M+ records through a documented nine-stage workflow that maps everything into a canonical relational schema across four tables (chemical, location, sample, sample_source), normalizing analytes, dates, units, locations, and QA findings along the way. OpenAI and Anthropic APIs powered non-detect identification and QA validation within the workflow, taking non-detect identification from 0% to 81% and cutting QA false positives by 53%.",
       "The pipeline's outputs feed a normalized MySQL data model and SQL reporting layer, plus standardized CSV/Excel exports and an optional DuckDB-backed database — powering Power BI, Tableau, and Streamlit dashboards for California PFAS trend analysis, built while leading a 5-person team on the Dockerized standardization tool.",
