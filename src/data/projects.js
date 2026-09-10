@@ -121,10 +121,11 @@ export const projects = [
   {
     id: 'vendor-analytics-dashboard',
     title: 'Payment & Vendor Analytics Dashboard',
-    company: 'Cal Poly Systems Optimizations Club · Ataa Pay, Sep 2026 — Present',
+    company: 'Ataa Pay, Sep 2026 — Present',
     stageBadge: 'serving',
     description: [
-      'A Cal Poly Systems Optimizations Club project, built for Ataa Pay, a South African payment and social welfare platform. It powers a map-based analytics dashboard that plots participating vendors.',
+      '(Via Cal Poly Systems Optimizations Club.)',
+      'Data Analytics pipeline built for Ataa Pay, a South African payment and social welfare platform. It powers a map-based analytics dashboard that plots participating vendors.',
       "As data engineering lead, I'm architecting the system design and scoping the technical requirements for a Python pipeline that scrapes participating vendor websites, lands raw and enriched records in an AWS S3 data lake, and enriches each vendor with geocoding data from OpenStreetMap and topography APIs. That pipeline powers the map-based dashboard that plots vendor locations across the platform.",
       "I'm also designing the geocode enrichment process itself, standardizing inconsistent vendor location data into a canonical form so it maps consistently. Its validation layer runs Great Expectations checks on the enriched records, with semantic validation via the Anthropic and OpenAI APIs as a fallback when fuzzy matching can't confidently resolve a location.",
       'As assistant project lead, I also delegate technical tasks across the team, coordinating the scraping, enrichment, dashboard integration, and the other work streams.',
@@ -152,6 +153,7 @@ export const projects = [
     company: 'EKI Environment and Water Inc., Jan 2026 — Jun 2026',
     stageBadge: 'transformation',
     description: [
+      '(Via Cal Poly Systems Optimization Club.)',
       "Nationwide sample analysis on man-made carcineogens.",
       "Built a data integration and standardization pipeline that ingests messy, inconsistent PFAS water-quality datasets from federal and state agencies and normalizes them at scale — resolving 1M+ records through a documented nine-stage workflow that maps everything into a canonical relational schema across four tables (chemical, location, sample, sample_source), normalizing analytes, dates, units, locations, and QA findings along the way. OpenAI and Anthropic APIs powered non-detect identification and QA validation within the workflow, taking non-detect identification from 0% to 81% and cutting QA false positives by 53%.",
       "The pipeline's outputs feed a normalized MySQL data model and SQL reporting layer, plus standardized CSV/Excel exports and an optional DuckDB-backed database — powering Power BI, Tableau, and Streamlit dashboards for California PFAS trend analysis, built while leading a 5-person team on the Dockerized standardization tool.",

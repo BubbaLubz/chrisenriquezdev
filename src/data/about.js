@@ -15,7 +15,7 @@ export const about = {
   resume: '/resume.pdf',
   email: 'mailto:chris.fog.city@gmail.com',
   experience: [
-    { title: 'B.S. Interdisciplinary Studies (CS + Music minors) — Cal Poly SLO', dateRange: 'Expected Jun 2028' },
+    { title: 'B.S. Interdisciplinary Studies (CS + Music) — Cal Poly SLO', dateRange: 'Expected Jun 2028' },
     { title: 'Data Engineering Lead & Assistant Project Lead — Ataa Pay', dateRange: 'Sep 2026 — Present' },
     { title: 'Data Engineering Consultant — EKI Environment and Water Inc.', dateRange: 'Jan 2026 — Jun 2026' },
   ],
