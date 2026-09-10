@@ -119,13 +119,17 @@ export const projects = [
     },
   },
   {
-    id: 'sticksplit',
-    title: 'CV Drumming Analytics Tool',
-    company: 'KiroHacks 2026',
+    id: 'vendor-analytics-dashboard',
+    title: 'Payment & Vendor Analytics Dashboard',
+    company: 'Cal Poly Systems Optimizations Club, Sep 2026 — Present',
     stageBadge: 'serving',
-    description:
-      'A video data pipeline for drumming footage — ingesting videos, sampling frames with OpenCV, extracting 19 MediaPipe landmarks, and computing 6 biomechanical metrics per clip. Calibrating landmark thresholds across 10 test videos cut pose-signal saturation from 80% to 30% and corrected metric inflation by 85%. The whole thing runs as a Dockerized FastAPI microservice handling ingestion, landmark extraction, metric computation, Firestore writes, and Pydantic validation.',
-    techStack: ['Python', 'FastAPI', 'MediaPipe', 'OpenCV', 'Firebase Firestore', 'Docker'],
+    description: [
+      'A map-based analytics dashboard for a South African payment and social welfare platform.',
+      "As data engineering lead, I'm architecting the system design and scoping the technical requirements for a Python pipeline that scrapes participating vendor websites, lands raw and enriched records in an AWS S3 data lake, and enriches each vendor with geocoding data from OpenStreetMap and topography APIs — powering a map-based dashboard that plots vendor locations across the platform.",
+      "I'm designing the geocode enrichment process itself — standardizing inconsistent vendor location data into a canonical form so it maps consistently — including its validation layer: Great Expectations checks on the enriched records, with semantic validation via the Anthropic and OpenAI APIs as a fallback when fuzzy matching can't confidently resolve a location.",
+      'As assistant project lead, I also delegate technical tasks across the team — coordinating the scraping, enrichment, dashboard integration, and the other work streams.',
+    ],
+    techStack: ['Python', 'AWS S3', 'OpenStreetMap API', 'Great Expectations', 'Anthropic API', 'OpenAI API'],
     links: {},
   },
   {
