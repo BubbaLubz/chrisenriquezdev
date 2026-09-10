@@ -1,0 +1,7 @@
+# SPA fallback for React Router client-side routes (/about, /project/:id).
+# Vite copies everything in public/ to the dist/ root at build time, so this
+# ships with the static bundle. Real asset requests are served as-is; anything
+# else returns index.html with a 200 so the router can handle it.
+# This duplicates the rewrite rule in render.yaml so the site still routes
+# correctly even if it was set up as a manual Static Site rather than a Blueprint.
+/*  /index.html  200
